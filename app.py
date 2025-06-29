@@ -5,14 +5,11 @@ Main Flask application with routes and database initialization
 
 import os
 from datetime import datetime
-from typing import Optional, List
-
 import click
 import markdown
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from models import Base, Page
 
 app = Flask(__name__)
@@ -24,7 +21,7 @@ engine = create_engine(DATABASE_URL, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Markdown processor
-md = markdown.Markdown(extensions=['extra', 'codehilite'])
+md = markdown.Markdown(extensions=['extra'])
 
 
 def get_db_session():
@@ -44,7 +41,7 @@ def index():
 
 
 @app.route('/page/<int:page_id>')
-def view_page(page_id: int):
+def view_page(page_id):
     """View a single page with rendered Markdown"""
     session = get_db_session()
     try:
@@ -92,7 +89,7 @@ def create_page():
 
 
 @app.route('/edit/<int:page_id>')
-def edit_page(page_id: int):
+def edit_page(page_id):
     """Show form to edit existing page"""
     session = get_db_session()
     try:
@@ -107,7 +104,7 @@ def edit_page(page_id: int):
 
 
 @app.route('/update/<int:page_id>', methods=['POST'])
-def update_page(page_id: int):
+def update_page(page_id):
     """Update an existing page"""
     title = request.form.get('title', '').strip()
     content = request.form.get('content', '').strip()
@@ -138,7 +135,7 @@ def update_page(page_id: int):
 
 
 @app.route('/delete/<int:page_id>', methods=['POST'])
-def delete_page(page_id: int):
+def delete_page(page_id):
     """Delete a page"""
     session = get_db_session()
     try:
@@ -177,14 +174,6 @@ def search():
         return render_template('search.html', pages=pages, query=query)
     finally:
         session.close()
-
-
-@app.route('/api/preview', methods=['POST'])
-def preview_markdown():
-    """API endpoint for live Markdown preview"""
-    content = request.json.get('content', '')
-    html = md.convert(content)
-    return jsonify({'html': html})
 
 
 @app.cli.command('init-db')

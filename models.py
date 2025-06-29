@@ -1,20 +1,13 @@
 """
-Database models using SQLAlchemy 2.x
+Database models using SQLAlchemy 1.4
 Defines the Page model for storing notes
 """
 
 from datetime import datetime
-from typing import Optional
+from sqlalchemy import Column, Integer, String, Text, DateTime
+from sqlalchemy.ext.declarative import declarative_base
 
-
-# NUOVO:
-from sqlalchemy import String, Text, DateTime, Integer
-from sqlalchemy.sql import func
-
-
-class Base(DeclarativeBase):
-    """Base class for all database models"""
-    pass
+Base = declarative_base()
 
 
 class Page(Base):
@@ -23,25 +16,21 @@ class Page(Base):
     __tablename__ = 'pages'
     
     # Primary key
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     
     # Page content
-    title: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
-    content: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    title = Column(String(200), nullable=False, index=True)
+    content = Column(Text, nullable=False, default='')
     
     # Timestamps
-created_at: Mapped[datetime] = mapped_column(
-    DateTime, nullable=False, default=func.now()
-)
-updated_at: Mapped[datetime] = mapped_column(
-    DateTime, nullable=False, default=func.now(), onupdate=func.now()
-)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    def __repr__(self) -> str:
+    def __repr__(self):
         """String representation of Page object"""
         return f'<Page(id={self.id}, title="{self.title[:30]}...")>'
     
-    def summary(self, max_length: int = 150) -> str:
+    def summary(self, max_length=150):
         """Return a summary of the page content"""
         if len(self.content) <= max_length:
             return self.content
