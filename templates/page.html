@@ -23,7 +23,8 @@
                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                     Edit
                 </a>
-                <button onclick="confirmDelete({{ page.id }}, '{{ page.title|replace("'", "\\'") }}')" 
+                <button data-page-id="{{ page.id }}" data-page-title="{{ page.title }}" 
+                        onclick="confirmDelete(this)"
                         class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
                     Delete
                 </button>
@@ -58,9 +59,12 @@
 
 {% block scripts %}
 <script>
-function confirmDelete(pageId, pageTitle) {
+function confirmDelete(button) {
+    var pageId = button.getAttribute('data-page-id');
+    var pageTitle = button.getAttribute('data-page-title');
+    
     if (confirm('Are you sure you want to delete "' + pageTitle + '"?')) {
-        const form = document.createElement('form');
+        var form = document.createElement('form');
         form.method = 'POST';
         form.action = '/delete/' + pageId;
         document.body.appendChild(form);

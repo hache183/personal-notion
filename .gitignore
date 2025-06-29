@@ -12,7 +12,6 @@ notes.db
 *.db
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
