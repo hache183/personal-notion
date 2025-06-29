@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Search: {{ query }} - Personal Notion{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Search Results</h1>
+    <p class="text-gray-600">
+        Found {{ pages|length }} result{{ 's' if pages|length != 1 else '' }} for 
+        <strong>"{{ query }}"</strong>
+    </p>
+</div>
+
+{% if pages %}
+    <div class="grid gap-4">
+        {% for page in pages %}
+            <div class="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h2 class="text-xl font-semibold text-gray-900 mb-2">
+                                <a href="{{ url_for('view_page', page_id=page.id) }}" 
+                                   class="hover:text-blue-600 transition-colors">
+                                    {{ page.title }}
+                                </a>
+                            </h2>
+                            
+                            {% if page.content %}
+                                <p class="text-gray-600 mb-3">
+                                    {{ page.summary(150) }}
+                                </p>
+                            {% endif %}
+                            
+                            <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                <span>Created {{ page.created_at.strftime('%b %d, %Y') }}</span>
+                                {% if page.updated_at != page.created_at %}
+                                    <span>•</span>
+                                    <span>Updated {{ page.updated_at.strftime('%b %d, %Y') }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-2 ml-4">
+                            <a href="{{ url_for('edit_page', page_id=page.id) }}" 
+                               class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                Edit
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-16">
+        <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-gray-400 text-4xl">🔍</span>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">No results found</h2>
+        <p class="text-gray-600 mb-6">Try a different search term</p>
+        <a href="{{ url_for('index') }}" 
+           class="text-blue-600 hover:text-blue-800 font-medium">
+            ← Back to all pages
+        </a>
+    </div>
+{% endif %}
+
+<div class="mt-8">
+    <a href="{{ url_for('index') }}" 
+       class="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center">
+        ← Back to all pages
+    </a>
+</div>
+{% endblock %}

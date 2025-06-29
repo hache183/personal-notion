@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} - Personal Notion{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm border">
+    <div class="p-8">
+        <!-- Page Header -->
+        <div class="flex items-start justify-between mb-8">
+            <div class="flex-1">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ page.title }}</h1>
+                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                    <span>Created {{ page.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                    {% if page.updated_at != page.created_at %}
+                        <span>•</span>
+                        <span>Updated {{ page.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <a href="{{ url_for('edit_page', page_id=page.id) }}" 
+                   class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    Edit
+                </a>
+                <button onclick="confirmDelete({{ page.id }}, '{{ page.title|e }}')" 
+                        class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                    Delete
+                </button>
+            </div>
+        </div>
+        
+        <!-- Page Content -->
+        {% if page.content %}
+            <div class="markdown-content prose max-w-none">
+                {{ content_html|safe }}
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <p class="text-gray-500 text-lg">This page is empty</p>
+                <a href="{{ url_for('edit_page', page_id=page.id) }}" 
+                   class="text-blue-600 hover:text-blue-800 font-medium">
+                    Add some content
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Back to Home -->
+<div class="mt-8">
+    <a href="{{ url_for('index') }}" 
+       class="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center">
+        ← Back to all pages
+    </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDelete(pageId, pageTitle) {
+    if (confirm(`Are you sure you want to delete "${pageTitle}"?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/delete/${pageId}`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

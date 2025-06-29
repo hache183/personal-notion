@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Personal Notion{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Marked.js for Markdown preview -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        /* Custom styles for markdown content */
+        .markdown-content h1 { @apply text-2xl font-bold mb-4 mt-6; }
+        .markdown-content h2 { @apply text-xl font-semibold mb-3 mt-5; }
+        .markdown-content h3 { @apply text-lg font-medium mb-2 mt-4; }
+        .markdown-content p { @apply mb-4 leading-relaxed; }
+        .markdown-content ul { @apply list-disc ml-6 mb-4; }
+        .markdown-content ol { @apply list-decimal ml-6 mb-4; }
+        .markdown-content blockquote { @apply border-l-4 border-gray-300 pl-4 italic mb-4; }
+        .markdown-content code { @apply bg-gray-100 px-1 py-0.5 rounded text-sm; }
+        .markdown-content pre { @apply bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4; }
+        .markdown-content pre code { @apply bg-transparent p-0; }
+        .markdown-content a { @apply text-blue-600 hover:text-blue-800 underline; }
+        
+        /* Auto-resize textarea */
+        .auto-resize {
+            resize: none;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-4xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo/Title -->
+                <a href="{{ url_for('index') }}" class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">N</span>
+                    </div>
+                    <span class="text-xl font-semibold text-gray-900">Personal Notion</span>
+                </a>
+                
+                <!-- Search -->
+                <form action="{{ url_for('search') }}" method="GET" class="flex-1 max-w-md mx-8">
+                    <input 
+                        type="text" 
+                        name="q" 
+                        placeholder="Search pages..." 
+                        value="{{ request.args.get('q', '') }}"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                </form>
+                
+                <!-- New Page Button -->
+                <a href="{{ url_for('new_page') }}" 
+                   class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    New Page
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-6">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} mb-2 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700 border border-red-300{% else %}bg-green-100 text-green-700 border border-green-300{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>
